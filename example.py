@@ -15,6 +15,9 @@ import numpy as np
 from augmentations.nta_augmentation import nucleotide_augment
 # Import Residue Masking augmentations
 from augmentations.residue_masking import mask_residues, conservative_mask_residues
+# Import NanaMigu augmentations
+from augmentations.nana_augmentation import nana_augment
+from augmentations.migu_augmentation import migu_augment
 
 # Unzip the yeast_ppi.zip file
 zip_path = "/content/yeast_ppi.zip"
@@ -167,6 +170,8 @@ AUGMENTATION_FUNCTIONS = [
     nucleotide_augment,  # NTA: Nucleotide Augmentation (Minot & Reddy 2022)
     mask_residues,  # Residue Masking (MLM-style, inspired by ProtBERT/ESM)
     conservative_mask_residues,  # Conservative Masking (preserves chemical properties)
+    nana_augment,  # NaNa: Novel Augmentation of New Node Attributes (NanaMigu)
+    migu_augment,  # MiGu: Molecular Interactions and Geometric Upgrading (NanaMigu)
 ]
 
 # Dataset class with augmentation
