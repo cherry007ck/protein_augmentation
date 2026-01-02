@@ -1,0 +1,121 @@
+# Remote Homology Detection Configuration
+# Dataset: SCOPe database (fold prediction)
+
+# Output directory for results
+output_dir: ./training_results/remote_homology/
+
+# Dataset configuration
+dataset:
+  name: remote_homology
+  task_type: homology
+  train_path: datasets/remote_homology/remote_homology_train.lmdb
+  valid_path: datasets/remote_homology/remote_homology_valid.lmdb
+  test_path: datasets/remote_homology/remote_homology_test_family_holdout.lmdb
+  additional_test_paths:
+    - datasets/remote_homology/remote_homology_test_fold_holdout.lmdb
+    - datasets/remote_homology/remote_homology_test_superfamily_holdout.lmdb
+  max_sequence_length: 512
+
+# Task configuration
+task:
+  type: multiclass_classification
+  label_type: fold  # Options: fold, superfamily, family, class
+  num_classes: 1195  # For fold prediction
+  # num_classes: 7 for class prediction
+  # num_classes varies for superfamily/family
+
+# Model architecture
+model:
+  class: ProteinClassificationLSTM
+  embed_dim: 128
+  hidden_dim: 256
+  vocab_size: 21
+  num_layers: 2
+  bidirectional: true
+  dropout: 0.3
+
+# Loss and metrics
+criterion: ce  # Cross Entropy
+metrics:
+  - accuracy
+  - top3_accuracy
+  - top5_accuracy
+  - top10_accuracy
+  - f1_macro
+  - f1_weighted
+eval_metric: accuracy
+
+# Data augmentation
+augmentation:
+  enabled: false
+  intensity: 0.15
+  probability: 0.7
+  techniques:
+    - crop_random_segment
+    - delete_random_residues
+    - substitute_random_residues
+    - nucleotide_augment
+    - mask_residues
+
+# Optimizer configuration
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+
+# Learning rate scheduler
+scheduler:
+  enabled: true
+  class: CosineAnnealingLR
+  T_max: 15
+  eta_min: 1.0e-6
+
+# Training configuration
+train:
+  num_epochs: 15
+  batch_size: 32
+  num_workers: 0
+  shuffle: true
+  early_stopping:
+    enabled: true
+    patience: 20
+    min_delta: 0.0001
+  gradient_clipping:
+    enabled: true
+    max_norm: 1.0
+
+# Validation configuration
+validation:
+  batch_size: 32
+  num_workers: 0
+
+# Testing configuration
+test:
+  batch_size: 32
+  num_workers: 0
+
+# Device configuration
+device:
+  gpus: [0]
+  mixed_precision: false
+
+# Logging and checkpointing
+logging:
+  log_interval: 20
+  save_best_model: true
+  save_last_model: true
+  tensorboard: false
+  wandb:
+    enabled: false
+    project: protein_augmentation
+    entity: null
+
+# Random seed for reproducibility
+seed: 42
+
+# Advanced options
+advanced:
+  deterministic: true
+  benchmark: false
+  label_smoothing: 0.0  # 0.0 = no smoothing, 0.1 = smooth

@@ -1,0 +1,119 @@
+# Protein-Protein Interaction (PPI) Configuration
+# Dataset: Yeast PPI
+
+# Output directory for results
+output_dir: ./training_results/yeast_ppi/
+
+# Dataset configuration
+dataset:
+  name: yeast_ppi
+  task_type: ppi
+  train_path: datasets/yeast_ppi/yeast_ppi_train.lmdb
+  valid_path: datasets/yeast_ppi/yeast_ppi_valid.lmdb
+  test_path: datasets/yeast_ppi/yeast_ppi_test.lmdb
+  additional_test_paths:
+    - datasets/yeast_ppi/yeast_ppi_cross_species_test.lmdb
+  max_sequence_length: 512
+
+# Task configuration
+task:
+  type: binary_classification
+  num_classes: 2
+  class_names: ["No Interaction", "Interaction"]
+
+# Model architecture
+model:
+  class: ProteinInteractionLSTM
+  embed_dim: 64
+  hidden_dim: 128
+  vocab_size: 21
+  bidirectional: true
+  num_layers: 1
+  dropout: 0.3
+
+# Loss and metrics
+criterion: bce  # Binary Cross Entropy
+metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1_score
+  - mcc  # Matthews Correlation Coefficient
+  - auroc  # Area Under ROC Curve
+eval_metric: accuracy  # Primary metric for model selection
+
+# Data augmentation
+augmentation:
+  enabled: false
+  intensity: 0.15
+  probability: 0.7
+  techniques:
+    - crop_random_segment
+    - delete_random_residues
+    - substitute_random_residues
+    - nucleotide_augment
+    - mask_residues
+
+# Optimizer configuration
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+  weight_decay: 0.0
+  betas: [0.9, 0.999]
+
+# Learning rate scheduler (optional)
+scheduler:
+  enabled: false
+  class: ReduceLROnPlateau
+  mode: max
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-6
+
+# Training configuration
+train:
+  num_epochs: 15
+  batch_size: 32
+  num_workers: 0  # Set to 0 for LMDB compatibility
+  shuffle: true
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+  gradient_clipping:
+    enabled: false
+    max_norm: 1.0
+
+# Validation configuration
+validation:
+  batch_size: 32
+  num_workers: 0
+
+# Testing configuration
+test:
+  batch_size: 32
+  num_workers: 0
+
+# Device configuration
+device:
+  gpus: [0]  # GPU indices to use (empty list for CPU)
+  mixed_precision: false
+
+# Logging and checkpointing
+logging:
+  log_interval: 10  # Log every N batches
+  save_best_model: true
+  save_last_model: true
+  tensorboard: false
+  wandb:
+    enabled: false
+    project: protein_augmentation
+    entity: null
+
+# Random seed for reproducibility
+seed: 42
+
+# Advanced options
+advanced:
+  deterministic: true
+  benchmark: false

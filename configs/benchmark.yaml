@@ -1,0 +1,80 @@
+# Benchmark Configuration
+# For testing all augmentations individually
+
+# Output directory for results
+output_dir: ./benchmark_results/
+
+# Dataset configuration
+dataset:
+  name: yeast_ppi
+  task_type: ppi
+
+# Augmentations to benchmark
+augmentations:
+  - name: vanilla
+    enabled: true
+  - name: crop_random_segment
+    enabled: true
+  - name: delete_random_residues
+    enabled: true
+  - name: reverse_sequence
+    enabled: true
+  - name: shuffle_random_segment
+    enabled: true
+  - name: cut_and_shuffle
+    enabled: true
+  - name: subsequence_shuffle
+    enabled: true
+  - name: insert_random_residues
+    enabled: true
+  - name: substitute_random_residues
+    enabled: true
+  - name: swap_random_residues
+    enabled: true
+  - name: back_translation_substitute
+    enabled: true
+  - name: nucleotide_augment
+    enabled: true
+  - name: mask_residues
+    enabled: true
+  - name: conservative_mask_residues
+    enabled: true
+
+# Augmentation parameters
+augmentation:
+  intensity: 0.15
+  probability: 0.7
+
+# Model architecture (same for all)
+model:
+  class: ProteinInteractionLSTM
+  embed_dim: 64
+  hidden_dim: 128
+  vocab_size: 21
+  bidirectional: true
+  dropout: 0.3
+
+# Training configuration
+train:
+  num_epochs: 15
+  batch_size: 32
+  num_workers: 0
+
+# Optimizer configuration
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+
+# Metrics to compute
+metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1_score
+
+# Device configuration
+device:
+  gpus: [0]
+
+# Random seed
+seed: 42

@@ -1,0 +1,67 @@
+# Test Configuration with Augmentation Enabled
+# Yeast PPI with augmentation
+
+output_dir: ./training_results/yeast_ppi_aug_test/
+
+dataset:
+  name: yeast_ppi
+  task_type: ppi
+  train_path: datasets/yeast_ppi/yeast_ppi_train.lmdb
+  valid_path: datasets/yeast_ppi/yeast_ppi_valid.lmdb
+  test_path: datasets/yeast_ppi/yeast_ppi_test.lmdb
+  additional_test_paths:
+    - datasets/yeast_ppi/yeast_ppi_cross_species_test.lmdb
+  max_sequence_length: 512
+
+task:
+  type: binary_classification
+  num_classes: 2
+
+model:
+  class: ProteinInteractionLSTM
+  embed_dim: 64
+  hidden_dim: 128
+  vocab_size: 21
+  bidirectional: true
+  dropout: 0.3
+
+criterion: bce
+metrics: [accuracy, precision, recall, f1_score]
+eval_metric: accuracy
+
+augmentation:
+  enabled: true  # ENABLED!
+  intensity: 0.15
+  probability: 0.7
+  techniques:
+    - crop_random_segment
+    - substitute_random_residues
+    - nucleotide_augment
+    - mask_residues
+
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+
+scheduler:
+  enabled: false
+
+train:
+  num_epochs: 3
+  batch_size: 32
+  num_workers: 0
+  shuffle: true
+  early_stopping:
+    enabled: false
+  gradient_clipping:
+    enabled: false
+
+device:
+  gpus: [0]
+
+logging:
+  log_interval: 10
+  save_best_model: true
+  save_last_model: false
+
+seed: 42

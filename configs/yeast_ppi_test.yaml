@@ -1,0 +1,92 @@
+# Quick Test Configuration for Yeast PPI
+# Reduced epochs for fast testing
+
+output_dir: ./training_results/yeast_ppi_test/
+
+dataset:
+  name: yeast_ppi
+  task_type: ppi
+  train_path: datasets/yeast_ppi/yeast_ppi_train.lmdb
+  valid_path: datasets/yeast_ppi/yeast_ppi_valid.lmdb
+  test_path: datasets/yeast_ppi/yeast_ppi_test.lmdb
+  additional_test_paths:
+    - datasets/yeast_ppi/yeast_ppi_cross_species_test.lmdb
+  max_sequence_length: 512
+
+task:
+  type: binary_classification
+  num_classes: 2
+  class_names: ["No Interaction", "Interaction"]
+
+model:
+  class: ProteinInteractionLSTM
+  embed_dim: 64
+  hidden_dim: 128
+  vocab_size: 21
+  bidirectional: true
+  num_layers: 1
+  dropout: 0.3
+
+criterion: bce
+metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1_score
+eval_metric: accuracy
+
+augmentation:
+  enabled: false
+  intensity: 0.15
+  probability: 0.7
+  techniques:
+    - crop_random_segment
+    - nucleotide_augment
+
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+  weight_decay: 0.0
+  betas: [0.9, 0.999]
+
+scheduler:
+  enabled: false
+
+train:
+  num_epochs: 3  # Quick test
+  batch_size: 32
+  num_workers: 0
+  shuffle: true
+  early_stopping:
+    enabled: true
+    patience: 5
+    min_delta: 0.001
+  gradient_clipping:
+    enabled: false
+    max_norm: 1.0
+
+validation:
+  batch_size: 32
+  num_workers: 0
+
+test:
+  batch_size: 32
+  num_workers: 0
+
+device:
+  gpus: [0]
+  mixed_precision: false
+
+logging:
+  log_interval: 10
+  save_best_model: true
+  save_last_model: true
+  tensorboard: false
+  wandb:
+    enabled: false
+
+seed: 42
+
+advanced:
+  deterministic: true
+  benchmark: false

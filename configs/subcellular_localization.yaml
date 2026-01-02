@@ -1,0 +1,131 @@
+# Subcellular Localization Configuration
+# Dataset: DeepLoc dataset
+
+# Output directory for results
+output_dir: ./training_results/subcellular_localization/
+
+# Dataset configuration
+dataset:
+  name: subcellular_localization
+  task_type: localization
+  train_path: datasets/subcellular_localization/subcellular_localization_train.lmdb
+  valid_path: datasets/subcellular_localization/subcellular_localization_valid.lmdb
+  test_path: datasets/subcellular_localization/subcellular_localization_test.lmdb
+  max_sequence_length: 512
+
+# Task configuration
+task:
+  type: multiclass_classification
+  num_classes: 10
+  class_names:
+    - Cell membrane
+    - Cytoplasm
+    - Endoplasmic reticulum
+    - Golgi apparatus
+    - Lysosome/Vacuole
+    - Mitochondrion
+    - Nucleus
+    - Peroxisome
+    - Plastid
+    - Extracellular
+
+# Model architecture
+model:
+  class: ProteinClassificationLSTM
+  embed_dim: 128
+  hidden_dim: 256
+  vocab_size: 21
+  num_layers: 2
+  bidirectional: true
+  dropout: 0.3
+
+# Loss and metrics
+criterion: ce  # Cross Entropy
+metrics:
+  - accuracy
+  - top3_accuracy
+  - top5_accuracy
+  - f1_macro
+  - f1_weighted
+  - precision_macro
+  - recall_macro
+  - confusion_matrix
+eval_metric: accuracy  # Primary metric for model selection
+
+# Data augmentation
+augmentation:
+  enabled: false
+  intensity: 0.15
+  probability: 0.7
+  techniques:
+    - crop_random_segment
+    - delete_random_residues
+    - substitute_random_residues
+    - nucleotide_augment
+    - mask_residues
+    - conservative_mask_residues
+
+# Optimizer configuration
+optimizer:
+  class: Adam
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+  betas: [0.9, 0.999]
+
+# Learning rate scheduler
+scheduler:
+  enabled: true
+  class: ReduceLROnPlateau
+  mode: max
+  factor: 0.5
+  patience: 5
+  min_lr: 1.0e-6
+
+# Training configuration
+train:
+  num_epochs: 15
+  batch_size: 32
+  num_workers: 0
+  shuffle: true
+  early_stopping:
+    enabled: true
+    patience: 15
+    min_delta: 0.001
+  gradient_clipping:
+    enabled: true
+    max_norm: 1.0
+
+# Validation configuration
+validation:
+  batch_size: 32
+  num_workers: 0
+
+# Testing configuration
+test:
+  batch_size: 32
+  num_workers: 0
+
+# Device configuration
+device:
+  gpus: [0]
+  mixed_precision: false
+
+# Logging and checkpointing
+logging:
+  log_interval: 10
+  save_best_model: true
+  save_last_model: true
+  tensorboard: false
+  wandb:
+    enabled: false
+    project: protein_augmentation
+    entity: null
+
+# Random seed for reproducibility
+seed: 42
+
+# Advanced options
+advanced:
+  deterministic: true
+  benchmark: false
+  class_weights: null  # Auto-compute from training data if null
