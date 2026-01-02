@@ -80,6 +80,45 @@ masked_cons = conservative_mask_residues(sequence, masking_rate=0.15)
 # Result: ~15% replaced with chemically similar AAs
 ```
 
+### 3. BootGen (Bootstrapped Generation)
+
+**Reference**: Anand et al., 2023 - "Bootstrapped Training of Score-Conditioned Generator for Offline Design of Biological Sequences" (NeurIPS 2023)
+([arXiv: 2306.00111](https://arxiv.org/abs/2306.00111))
+
+**Description**: A simplified implementation of BootGen that uses bootstrapped sampling with rank-based weighting to generate high-quality augmented sequences.
+
+**Algorithm**:
+1. Generate multiple candidate sequences (bootstrapped sampling)
+2. Score each candidate using proxy quality function
+3. Select best candidate using rank-based probabilistic selection
+
+**Key Features**:
+- ✓ Quality-aware augmentation (proxy scoring)
+- ✓ Bootstrapped candidate generation
+- ✓ Rank-based selection (favors high-quality sequences)
+- ✓ Biochemical property preservation
+- ✓ Conservative substitutions within same property groups
+
+**Scoring Components**:
+- Amino acid composition similarity (40%)
+- Biochemical property distribution similarity (40%)
+- Sequence length preservation (20%)
+
+**Usage**:
+```python
+from augmentations.bootgen import bootgen_augment
+
+sequence = ['M', 'E', 'T', 'H', 'Y', 'L', 'A', 'M', 'I', 'N', 'E']
+
+# Low intensity: minimal changes, high quality
+aug_conservative = bootgen_augment(sequence, intensity=0.2)
+
+# Moderate intensity: balanced diversity and quality
+aug_moderate = bootgen_augment(sequence, intensity=0.5)
+
+# High intensity: more aggressive changes
+aug_aggressive = bootgen_augment(sequence, intensity=0.8)
+
 ## Integration with Framework
 
 All augmentations are compatible with the framework interface in `example.py`:
@@ -88,8 +127,8 @@ All augmentations are compatible with the framework interface in `example.py`:
 # Import all augmentation functions
 from example import AUGMENTATION_FUNCTIONS
 
-# Framework now has 13 augmentation techniques
-print(len(AUGMENTATION_FUNCTIONS))  # 13
+# Framework now has 15 augmentation techniques
+print(len(AUGMENTATION_FUNCTIONS))  # 15
 
 # Random selection during training
 import random
@@ -105,6 +144,7 @@ augmented = aug_func(sequence, intensity=0.3)
 | 11 | NTA | Nucleotide-level | Yes (AA level) |
 | 12 | Residue Masking (MLM) | Masking | No |
 | 13 | Conservative Masking | Masking | No |
+| 14 | BootGen | Quality-aware generation | Partial (high similarity) |
 
 ## Testing
 
@@ -112,11 +152,13 @@ Run the test suites:
 ```bash
 python3 test_nta.py
 python3 test_residue_masking.py
+python3 test_bootgen.py
 ```
 
 Run the demonstrations:
 ```bash
 python3 demo_nta_simple.py
+python3 demo_bootgen.py
 ```
 
 ## Future Augmentation Techniques
@@ -125,7 +167,6 @@ Additional techniques from `research_papers/` that could be integrated:
 - IMAEN: Interpretable Molecular Augmentation Encoding Networks
 - Spider: Structure-based augmentation
 - RSA: Retrieved Sequence Augmentation
-- BootGen: Bootstrapped generation
 - PreIS: Protein sequence augmentation
 
 ## Contributing

@@ -7,10 +7,12 @@ including nucleotide-level and masking augmentations.
 
 from .nta_augmentation import nucleotide_augment
 from .residue_masking import mask_residues, simple_mask_residues, conservative_mask_residues
+from .bootgen import bootgen_augment
 
 __all__ = [
     'nucleotide_augment',
     'mask_residues',
     'simple_mask_residues',
-    'conservative_mask_residues'
+    'conservative_mask_residues',
+    'bootgen_augment'
 ]

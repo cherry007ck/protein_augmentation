@@ -15,6 +15,8 @@ import numpy as np
 from augmentations.nta_augmentation import nucleotide_augment
 # Import Residue Masking augmentations
 from augmentations.residue_masking import mask_residues, conservative_mask_residues
+# Import BootGen augmentation
+from augmentations.bootgen import bootgen_augment
 
 # Unzip the yeast_ppi.zip file
 zip_path = "/content/yeast_ppi.zip"
@@ -167,6 +169,7 @@ AUGMENTATION_FUNCTIONS = [
     nucleotide_augment,  # NTA: Nucleotide Augmentation (Minot & Reddy 2022)
     mask_residues,  # Residue Masking (MLM-style, inspired by ProtBERT/ESM)
     conservative_mask_residues,  # Conservative Masking (preserves chemical properties)
+    bootgen_augment,  # BootGen: Bootstrapped generation with rank-based selection (NeurIPS 2023)
 ]
 
 # Dataset class with augmentation
