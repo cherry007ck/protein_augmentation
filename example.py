@@ -17,6 +17,15 @@ from augmentations.nta_augmentation import nucleotide_augment
 from augmentations.residue_masking import mask_residues, conservative_mask_residues
 # Import Spider augmentation
 from augmentations.spider_augmentation import spider_augment
+# Import RSA (Retrieved Sequence Augmentation)
+from augmentations.rsa_augmentation import rsa_augment
+# Import PreIS augmentation
+from augmentations.preis_augmentation import preis_augment
+# Import NanaMigu augmentations
+from augmentations.nana_augmentation import nana_augment
+from augmentations.migu_augmentation import migu_augment
+# Import IMAEN augmentation
+from augmentations.imaen import imaen_simple
 
 # Unzip the yeast_ppi.zip file
 zip_path = "/content/yeast_ppi.zip"
@@ -170,6 +179,11 @@ AUGMENTATION_FUNCTIONS = [
     mask_residues,  # Residue Masking (MLM-style, inspired by ProtBERT/ESM)
     conservative_mask_residues,  # Conservative Masking (preserves chemical properties)
     spider_augment,  # Spider: Random substitution + insertion (Spider neurotoxic peptide paper)
+    rsa_augment,  # RSA: Retrieved Sequence Augmentation (Chang et al. 2023)
+    preis_augment,  # PreIS: Supervised Data Augmentation (simplified self-mixing)
+    nana_augment,  # NaNa: Novel Augmentation of New Node Attributes (NanaMigu)
+    migu_augment,  # MiGu: Molecular Interactions and Geometric Upgrading (NanaMigu)
+    imaen_simple,  # IMAEN: Interpretable Molecular Augmentation (property-aware substitution)
 ]
 
 # Dataset class with augmentation

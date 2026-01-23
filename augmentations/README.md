@@ -110,6 +110,98 @@ augmented_seq = spider_augment(sequence, intensity)
 ```
 
 **Note**: Original paper includes BLAST homology filtering (E-value threshold 1×10⁻⁵) to select biologically plausible sequences. This implementation provides the core augmentation without filtering for framework compatibility.
+### 3. NaNa (Novel Augmentation of New Node Attributes)
+
+**Reference**: "NaNa and MiGu: Semantic Data Augmentation Techniques to Enhance Protein Classification in Graph Neural Networks"
+
+**Description**: Semantic augmentation that substitutes amino acids with biophysically and structurally similar alternatives, preserving key molecular properties.
+
+**Algorithm**:
+1. Calculate multi-dimensional similarity (hydrophobicity, charge, size, secondary structure propensities)
+2. Select positions for substitution based on intensity
+3. Substitute with property-preserving alternatives
+
+**Key Features**:
+- ✓ Preserves molecular biophysical properties (hydrophobicity, charge, size)
+- ✓ Respects secondary structure propensities (α-helix, β-sheet, turn)
+- ✓ Multi-dimensional similarity scoring
+- ✓ Semantically meaningful augmentation
+
+**Properties Preserved**:
+- Hydrophobicity (Kyte-Doolittle scale)
+- Charge at pH 7.4
+- Van der Waals volume (size)
+- α-helix propensity (Chou-Fasman)
+- β-sheet propensity (Chou-Fasman)
+- Turn propensity (Chou-Fasman)
+
+**Usage**:
+```python
+from augmentations.nana_augmentation import nana_augment
+
+sequence = ['M', 'E', 'T', 'H', 'I', 'O', 'N', 'I', 'N', 'E']
+substitution_rate = 0.3  # 30% of residues will be substituted
+
+augmented_seq = nana_augment(sequence, substitution_rate)
+# Result: E→D (both negative), T→S (both polar), I→L/V (both hydrophobic)
+
+# With custom similarity threshold
+augmented_seq = nana_augment(
+    sequence, 
+    substitution_rate=0.3,
+    similarity_threshold=0.7,  # More conservative substitutions
+    use_groups=True  # Fast lookup using pre-defined groups
+)
+```
+
+### 4. MiGu (Molecular Interactions and Geometric Upgrading)
+
+**Reference**: "NaNa and MiGu: Semantic Data Augmentation Techniques to Enhance Protein Classification in Graph Neural Networks"
+
+**Description**: Context-aware augmentation that extends NaNa by considering local sequence context and preserving critical molecular interaction patterns.
+
+**Algorithm**:
+1. Analyze local sequence context (k-mer window)
+2. Identify interaction patterns (disulfide bonds, salt bridges, aromatic clusters)
+3. Make context-aware substitutions that preserve critical interactions
+
+**Key Features**:
+- ✓ Context-aware substitution based on neighboring residues
+- ✓ Preserves disulfide bonds (C-C pairs)
+- ✓ Preserves salt bridge potential (K/R-D/E interactions)
+- ✓ Maintains aromatic clusters (F/W/Y/H)
+- ✓ Respects local hydrophobic/charged environments
+
+**Interaction Patterns Preserved**:
+- Disulfide bonds (Cysteine pairs)
+- Salt bridges (K/R ↔ D/E)
+- Aromatic clusters (π-stacking)
+- Hydrophobic cores
+- Charged surface regions
+
+**Usage**:
+```python
+from augmentations.migu_augmentation import migu_augment
+
+sequence = list("MKTCYIAKQRQCSFVK")  # Contains C-C pair (potential disulfide)
+substitution_rate = 0.3
+
+# With interaction preservation (default)
+augmented_seq = migu_augment(
+    sequence, 
+    substitution_rate=0.3,
+    context_window=3,  # Consider ±3 residues
+    preserve_interactions=True  # Preserve critical patterns
+)
+# Result: C-C pair preserved, context-aware substitutions
+
+# Without preservation (more aggressive)
+augmented_seq = migu_augment(
+    sequence,
+    substitution_rate=0.5,
+    preserve_interactions=False
+)
+```
 
 ## Integration with Framework
 
@@ -121,6 +213,8 @@ from example import AUGMENTATION_FUNCTIONS
 
 # Framework now has 14 augmentation techniques
 print(len(AUGMENTATION_FUNCTIONS))  # 14
+# Framework now has 15 augmentation techniques
+print(len(AUGMENTATION_FUNCTIONS))  # 15
 
 # Random selection during training
 import random
@@ -137,6 +231,14 @@ augmented = aug_func(sequence, intensity=0.3)
 | 12 | Residue Masking (MLM) | Masking | No |
 | 13 | Conservative Masking | Masking | No |
 | 14 | Spider | Substitution + Insertion | No |
+| # | Technique | Type | Preserves | Properties Maintained |
+|---|-----------|------|-----------|----------------------|
+| 1-10 | Original APA techniques | Sequence-level | Varies | N/A |
+| 11 | NTA | Nucleotide-level | AA Identity | 100% AA identity |
+| 12 | Residue Masking (MLM) | Masking | No | N/A |
+| 13 | Conservative Masking | Masking | Chemical class | Property groups |
+| 14 | NaNa | Semantic | Properties | Biophysical + Structure |
+| 15 | MiGu | Semantic + Context | Interactions | Properties + Interactions |
 
 ## Testing
 
@@ -145,13 +247,51 @@ Run the test suites:
 python test_nta.py
 python test_residue_masking.py
 python test_spider.py
+# NTA tests
+python3 test_nta.py
+
+# Residue masking tests
+python3 test_residue_masking.py
+
+# NanaMigu tests
+python3 test_nana.py
+python3 test_migu.py
 ```
 
 Run the demonstrations:
 ```bash
 python demo_nta_simple.py
 python demo_spider_simple.py
+# NTA demo
+python3 demo_nta_simple.py
+
+# NanaMigu demos
+python3 demo_nana.py
+python3 demo_migu.py
 ```
+
+## Augmentation Selection Guide
+
+### When to use NTA:
+- Preserving exact amino acid sequence is critical
+- Working with protein engineering tasks
+- Need nucleotide-level diversity
+
+### When to use Residue Masking:
+- Training robust protein language models
+- Denoising-style augmentation
+- Simple and general-purpose augmentation
+
+### When to use NaNa:
+- Need property-preserving substitutions
+- Maintaining protein stability
+- Biophysical constraints matter
+
+### When to use MiGu:
+- Preserving structural interactions is important
+- Context matters (e.g., binding sites, active sites)
+- Working with structured proteins
+- Need both properties and interaction preservation
 
 ## Future Augmentation Techniques
 
