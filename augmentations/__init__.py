@@ -1,4 +1,13 @@
 """
+Protein sequence augmentation modules.
+
+This package contains various augmentation techniques for protein sequences:
+- NTA (Nucleotide Augmentation): Back-translation with synonymous substitutions
+- Residue Masking: MLM-style masking for denoising augmentation
+- RSA (Retrieved Sequence Augmentation): Conservative mutations simulating homologs
+"""
+
+from .rsa_augmentation import rsa_augment, rsa_augment_with_original
 Protein Sequence Augmentation Techniques
 
 This package contains various augmentation methods for protein sequences,
@@ -26,6 +35,8 @@ from .imaen import imaen_simple, imaen_augment
 __all__ = [
     'nucleotide_augment',
     'mask_residues',
+    'rsa_augment',
+    'rsa_augment_with_original',
     'preis_augment',
     'simple_mask_residues',
     'conservative_mask_residues',
