@@ -80,6 +80,44 @@ masked_cons = conservative_mask_residues(sequence, masking_rate=0.15)
 # Result: ~15% replaced with chemically similar AAs
 ```
 
+### 3. BootGen (Bootstrapped Generation)
+
+**Reference**: Anand et al., 2023 - "Bootstrapped Training of Score-Conditioned Generator for Offline Design of Biological Sequences" (NeurIPS 2023)
+([arXiv: 2306.00111](https://arxiv.org/abs/2306.00111))
+
+**Description**: A simplified implementation of BootGen that uses bootstrapped sampling with rank-based weighting to generate high-quality augmented sequences.
+
+**Algorithm**:
+1. Generate multiple candidate sequences (bootstrapped sampling)
+2. Score each candidate using proxy quality function
+3. Select best candidate using rank-based probabilistic selection
+
+**Key Features**:
+- ✓ Quality-aware augmentation (proxy scoring)
+- ✓ Bootstrapped candidate generation
+- ✓ Rank-based selection (favors high-quality sequences)
+- ✓ Biochemical property preservation
+- ✓ Conservative substitutions within same property groups
+
+**Scoring Components**:
+- Amino acid composition similarity (40%)
+- Biochemical property distribution similarity (40%)
+- Sequence length preservation (20%)
+
+**Usage**:
+```python
+from augmentations.bootgen import bootgen_augment
+
+sequence = ['M', 'E', 'T', 'H', 'Y', 'L', 'A', 'M', 'I', 'N', 'E']
+
+# Low intensity: minimal changes, high quality
+aug_conservative = bootgen_augment(sequence, intensity=0.2)
+
+# Moderate intensity: balanced diversity and quality
+aug_moderate = bootgen_augment(sequence, intensity=0.5)
+
+# High intensity: more aggressive changes
+aug_aggressive = bootgen_augment(sequence, intensity=0.8)
 ### 3. Spider Augmentation
 
 **Reference**: "A Deep Learning Approach with Data Augmentation to Predict Novel Spider Neurotoxic Peptides"
@@ -230,6 +268,7 @@ augmented = aug_func(sequence, intensity=0.3)
 | 11 | NTA | Nucleotide-level | Yes (AA level) |
 | 12 | Residue Masking (MLM) | Masking | No |
 | 13 | Conservative Masking | Masking | No |
+| 14 | BootGen | Quality-aware generation | Partial (high similarity) |
 | 14 | Spider | Substitution + Insertion | No |
 | # | Technique | Type | Preserves | Properties Maintained |
 |---|-----------|------|-----------|----------------------|
@@ -252,6 +291,7 @@ python3 test_nta.py
 
 # Residue masking tests
 python3 test_residue_masking.py
+python3 test_bootgen.py
 
 # NanaMigu tests
 python3 test_nana.py
@@ -264,6 +304,7 @@ python demo_nta_simple.py
 python demo_spider_simple.py
 # NTA demo
 python3 demo_nta_simple.py
+python3 demo_bootgen.py
 
 # NanaMigu demos
 python3 demo_nana.py
@@ -298,7 +339,6 @@ python3 demo_migu.py
 Additional techniques from `research_papers/` that could be integrated:
 - IMAEN: Interpretable Molecular Augmentation Encoding Networks
 - RSA: Retrieved Sequence Augmentation
-- BootGen: Bootstrapped generation
 - PreIS: Protein sequence augmentation
 
 ## Contributing
