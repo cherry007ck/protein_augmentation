@@ -18,6 +18,8 @@ from augmentations.residue_masking import mask_residues, conservative_mask_resid
 # Import NanaMigu augmentations
 from augmentations.nana_augmentation import nana_augment
 from augmentations.migu_augmentation import migu_augment
+# Import IMAEN augmentation
+from augmentations.imaen import imaen_simple
 
 # Unzip the yeast_ppi.zip file
 zip_path = "/content/yeast_ppi.zip"
@@ -172,6 +174,7 @@ AUGMENTATION_FUNCTIONS = [
     conservative_mask_residues,  # Conservative Masking (preserves chemical properties)
     nana_augment,  # NaNa: Novel Augmentation of New Node Attributes (NanaMigu)
     migu_augment,  # MiGu: Molecular Interactions and Geometric Upgrading (NanaMigu)
+    imaen_simple,  # IMAEN: Interpretable Molecular Augmentation (property-aware substitution)
 ]
 
 # Dataset class with augmentation
