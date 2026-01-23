@@ -15,6 +15,8 @@ import numpy as np
 from augmentations.nta_augmentation import nucleotide_augment
 # Import Residue Masking augmentations
 from augmentations.residue_masking import mask_residues, conservative_mask_residues
+# Import Spider augmentation
+from augmentations.spider_augmentation import spider_augment
 # Import RSA (Retrieved Sequence Augmentation)
 from augmentations.rsa_augmentation import rsa_augment
 # Import PreIS augmentation
@@ -176,6 +178,7 @@ AUGMENTATION_FUNCTIONS = [
     nucleotide_augment,  # NTA: Nucleotide Augmentation (Minot & Reddy 2022)
     mask_residues,  # Residue Masking (MLM-style, inspired by ProtBERT/ESM)
     conservative_mask_residues,  # Conservative Masking (preserves chemical properties)
+    spider_augment,  # Spider: Random substitution + insertion (Spider neurotoxic peptide paper)
     rsa_augment,  # RSA: Retrieved Sequence Augmentation (Chang et al. 2023)
     preis_augment,  # PreIS: Supervised Data Augmentation (simplified self-mixing)
     nana_augment,  # NaNa: Novel Augmentation of New Node Attributes (NanaMigu)

@@ -80,6 +80,36 @@ masked_cons = conservative_mask_residues(sequence, masking_rate=0.15)
 # Result: ~15% replaced with chemically similar AAs
 ```
 
+### 3. Spider Augmentation
+
+**Reference**: "A Deep Learning Approach with Data Augmentation to Predict Novel Spider Neurotoxic Peptides"
+
+**Description**: Creates sequence diversity through random amino acid substitution and insertion operations.
+
+**Algorithm**:
+1. Randomly substitute amino acids with other amino acids
+2. Randomly insert new amino acids at random positions
+
+**Key Features**:
+- ✓ Simple and effective sequence-level augmentation
+- ✓ Increases sequence diversity significantly
+- ✓ Can increase sequence length (due to insertions)
+- ✓ Biology-inspired (originally for neurotoxic peptide prediction)
+
+**Usage**:
+```python
+from augmentations.spider_augmentation import spider_augment
+
+# Augment a protein sequence
+sequence = ['M', 'E', 'T', 'H', 'Y', 'L', 'A', 'M', 'I', 'N', 'E']
+intensity = 0.3  # Controls both substitution and insertion rates
+
+augmented_seq = spider_augment(sequence, intensity)
+# Result: Some AAs substituted, some new AAs inserted
+# Length may increase due to insertions
+```
+
+**Note**: Original paper includes BLAST homology filtering (E-value threshold 1×10⁻⁵) to select biologically plausible sequences. This implementation provides the core augmentation without filtering for framework compatibility.
 ### 3. NaNa (Novel Augmentation of New Node Attributes)
 
 **Reference**: "NaNa and MiGu: Semantic Data Augmentation Techniques to Enhance Protein Classification in Graph Neural Networks"
@@ -181,6 +211,8 @@ All augmentations are compatible with the framework interface in `example.py`:
 # Import all augmentation functions
 from example import AUGMENTATION_FUNCTIONS
 
+# Framework now has 14 augmentation techniques
+print(len(AUGMENTATION_FUNCTIONS))  # 14
 # Framework now has 15 augmentation techniques
 print(len(AUGMENTATION_FUNCTIONS))  # 15
 
@@ -192,6 +224,13 @@ augmented = aug_func(sequence, intensity=0.3)
 
 ## Augmentation Summary
 
+| # | Technique | Type | Preserves Identity |
+|---|-----------|------|-------------------|
+| 1-10 | Original APA techniques | Sequence-level | No |
+| 11 | NTA | Nucleotide-level | Yes (AA level) |
+| 12 | Residue Masking (MLM) | Masking | No |
+| 13 | Conservative Masking | Masking | No |
+| 14 | Spider | Substitution + Insertion | No |
 | # | Technique | Type | Preserves | Properties Maintained |
 |---|-----------|------|-----------|----------------------|
 | 1-10 | Original APA techniques | Sequence-level | Varies | N/A |
@@ -205,6 +244,9 @@ augmented = aug_func(sequence, intensity=0.3)
 
 Run the test suites:
 ```bash
+python test_nta.py
+python test_residue_masking.py
+python test_spider.py
 # NTA tests
 python3 test_nta.py
 
@@ -218,6 +260,8 @@ python3 test_migu.py
 
 Run the demonstrations:
 ```bash
+python demo_nta_simple.py
+python demo_spider_simple.py
 # NTA demo
 python3 demo_nta_simple.py
 
@@ -253,7 +297,6 @@ python3 demo_migu.py
 
 Additional techniques from `research_papers/` that could be integrated:
 - IMAEN: Interpretable Molecular Augmentation Encoding Networks
-- Spider: Structure-based augmentation
 - RSA: Retrieved Sequence Augmentation
 - BootGen: Bootstrapped generation
 - PreIS: Protein sequence augmentation
